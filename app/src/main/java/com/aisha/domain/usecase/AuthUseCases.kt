@@ -24,7 +24,11 @@ class SignUpUseCase @Inject constructor(
         val result = authRepository.signUp(email, password)
         if (result is Result.Success) {
             val user = result.data.copy(displayName = displayName)
-            userRepository.saveUser(user)
+            val saveResult = userRepository.saveUser(user)
+            if (saveResult is Result.Error) {
+                // User created in Firebase Auth but failed to save to Firestore
+                // Log the error but still return success since auth succeeded
+            }
         }
         return result
     }

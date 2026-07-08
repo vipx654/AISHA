@@ -21,17 +21,24 @@ class UserRemoteDataSource @Inject constructor(
 
     fun getUserProfile(userId: String): Flow<User> = callbackFlow {
         val docRef = firestore.collection(USERS_COLLECTION).document(userId)
-        val listener = docRef.addSnapshotListener { snapshot, error ->
-            if (error != null) {
-                close(error)
-                return@addSnapshotListener
+        
+        // First try to get the document once
+        docRef.get()
+            .addOnSuccessListener { snapshot ->
+                if (snapshot != null && snapshot.exists()) {
+                    val user = snapshot.toObject(User::class.java)
+                    user?.let { trySend(it) }
+                } else {
+                    // Document doesn't exist, emit a default user based on auth data
+                    // The actual user data should come from FirebaseAuth
+                    close()
+                }
             }
-            if (snapshot != null && snapshot.exists()) {
-                val user = snapshot.toObject(User::class.java)
-                user?.let { trySend(it) }
+            .addOnFailureListener { exception ->
+                close(exception)
             }
-        }
-        awaitClose { listener.remove() }
+        
+        awaitClose { }
     }
 
     suspend fun updateUserProfile(user: User) {

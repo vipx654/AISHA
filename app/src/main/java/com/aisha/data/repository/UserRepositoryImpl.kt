@@ -6,6 +6,7 @@ import com.aisha.domain.model.User
 import com.aisha.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -15,13 +16,14 @@ class UserRepositoryImpl @Inject constructor(
     private val userRemoteDataSource: UserRemoteDataSource
 ) : UserRepository {
 
-    override fun getUserProfile(userId: String): Flow<Result<User>> {
-        return userRemoteDataSource.getUserProfile(userId)
-            .map { user -> 
-                @Suppress("USELESS_CAST")
-                Result.Success(user) as Result<User>
+    override fun getUserProfile(userId: String): Flow<Result<User>> = flow {
+        try {
+            userRemoteDataSource.getUserProfile(userId).collect { user ->
+                emit(Result.Success(user))
             }
-            .catch { e -> emit(Result.Error(e)) }
+        } catch (e: Exception) {
+            emit(Result.Error(e))
+        }
     }
 
     override suspend fun updateUserProfile(user: User): Result<Unit> {

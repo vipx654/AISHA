@@ -37,22 +37,23 @@ class ProfileViewModel @Inject constructor(
     private fun loadProfile() {
         viewModelScope.launch {
             getCurrentUserUseCase().collect { currentUser ->
-                _state.value = _state.value.copy(user = currentUser, isLoading = false)
-                
                 currentUser?.let { user ->
                     getUserProfileUseCase(user.uid).collect { result ->
                         when (result) {
                             is Result.Success -> {
-                                _state.value = _state.value.copy(user = result.data)
+                                _state.value = _state.value.copy(user = result.data, isLoading = false)
                             }
                             is Result.Error -> {
-                                _state.value = _state.value.copy(error = result.exception.message)
+                                // Fall back to auth user data if Firestore profile doesn't exist
+                                _state.value = _state.value.copy(user = user, isLoading = false)
                             }
                             is Result.Loading -> {
-                                // Loading state already set
+                                _state.value = _state.value.copy(isLoading = true)
                             }
                         }
                     }
+                } ?: run {
+                    _state.value = _state.value.copy(user = null, isLoading = false)
                 }
             }
         }
