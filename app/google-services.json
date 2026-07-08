@@ -1,13 +1,13 @@
 {
   "project_info": {
-    "project_number": "000000000000",
-    "project_id": "aisha-placeholder",
-    "storage_bucket": "aisha-placeholder.appspot.com"
+    "project_number": "103147847916",
+    "project_id": "aisha-e7676",
+    "storage_bucket": "aisha-e7676.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:000000000000:android:0000000000000000000000",
+        "mobilesdk_app_id": "1:103147847916:android:1c4f7e04896a13414125c9",
         "android_client_info": {
           "package_name": "com.aisha"
         }
@@ -15,7 +15,7 @@
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "PLACEHOLDER_API_KEY"
+          "current_key": "AIzaSyDSFzXhqE0wB2lF6g4_gbmDEXKrULmfZnU"
         }
       ],
       "services": {
