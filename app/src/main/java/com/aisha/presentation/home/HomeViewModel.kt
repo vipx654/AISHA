@@ -2,6 +2,7 @@ package com.aisha.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.aisha.data.repository.MemoryRepository
 import com.aisha.domain.model.Mood
 import com.aisha.domain.model.Message
 import com.aisha.domain.model.LoveBond
@@ -14,6 +15,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import java.util.UUID
 import javax.inject.Inject
@@ -24,12 +26,10 @@ import kotlin.random.Random
 data class HomeState(
     val user: User? = null,
     val isLoading: Boolean = true,
-    // Chat state
     val messages: List<Message> = emptyList(),
     val currentMessage: String = "",
     val isAISHAThinking: Boolean = false,
     val isRecordingVoice: Boolean = false,
-    // Mood & Bond
     val mood: Mood = Mood(),
     val bond: LoveBond = LoveBond()
 )
@@ -37,23 +37,58 @@ data class HomeState(
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
-    private val signOutUseCase: SignOutUseCase
+    private val signOutUseCase: SignOutUseCase,
+    private val memoryRepository: MemoryRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
     private val conversationHistory = mutableListOf<Pair<String, String>>()
+    private var userId: String = ""
 
     init {
-        observeCurrentUser()
-        addWelcomeMessage()
+        loadUserData()
     }
 
-    private fun observeCurrentUser() {
+    private fun loadUserData() {
         viewModelScope.launch {
-            getCurrentUserUseCase().collect { user ->
-                _state.value = _state.value.copy(user = user, isLoading = false)
+            val user = getCurrentUserUseCase().first()
+            userId = user?.uid ?: ""
+            
+            // Load saved mood and bond
+            val savedMood = memoryRepository.getMood()
+            val savedBond = memoryRepository.getBond()
+            
+            _state.value = _state.value.copy(
+                user = user,
+                isLoading = false,
+                mood = savedMood,
+                bond = LoveBond(level = savedBond, stage = BondStage.fromLevel(savedBond))
+            )
+            
+            // Load today's log or create welcome message
+            val todayLog = memoryRepository.getTodayLog(userId)
+            if (todayLog.conversations.isNotEmpty()) {
+                // Restore from saved conversations
+                val restoredMessages = mutableListOf<Message>()
+                todayLog.conversations.forEach { entry ->
+                    restoredMessages.add(Message(
+                        id = UUID.randomUUID().toString(),
+                        content = entry.userMessage,
+                        isFromUser = true,
+                        timestamp = entry.timestamp
+                    ))
+                    restoredMessages.add(Message(
+                        id = UUID.randomUUID().toString(),
+                        content = entry.aishaResponse,
+                        isFromUser = false,
+                        timestamp = entry.timestamp + 100
+                    ))
+                }
+                _state.value = _state.value.copy(messages = restoredMessages)
+            } else {
+                addWelcomeMessage()
             }
         }
     }
@@ -96,6 +131,9 @@ class HomeViewModel @Inject constructor(
             val response = generateResponse(userMessage)
             conversationHistory[conversationHistory.lastIndex] = userMessage to response
             
+            // Save conversation to memory
+            memoryRepository.saveConversation(userId, userMessage, response, _state.value.mood)
+            
             val aishaMsg = Message(
                 id = UUID.randomUUID().toString(),
                 content = response,
@@ -135,6 +173,8 @@ class HomeViewModel @Inject constructor(
                 "अच्छा, मैं समझ गई। और बताइए।",
                 "हाँ, मैं आपकी बात सुन रही हूँ।"
             ).random()
+            
+            memoryRepository.saveConversation(userId, "🎤 Voice message", response, _state.value.mood)
             
             val aishaMsg = Message(
                 id = UUID.randomUUID().toString(),
@@ -187,10 +227,17 @@ class HomeViewModel @Inject constructor(
         }
 
         val newBondLevel = min(1f, currentBond.level + interactionQuality)
+        
         _state.value = _state.value.copy(
             mood = newMood,
             bond = LoveBond(level = newBondLevel, stage = BondStage.fromLevel(newBondLevel))
         )
+        
+        // Persist mood and bond
+        viewModelScope.launch {
+            memoryRepository.saveMood(newMood)
+            memoryRepository.saveBond(newBondLevel)
+        }
     }
 
     private fun generateResponse(userMessage: String): String {
@@ -238,6 +285,18 @@ class HomeViewModel @Inject constructor(
 
             userLower.contains("mood") || userLower.contains("feel") -> {
                 "मेरी mood: ${mood.getOverallMood()} ${mood.getMoodEmoji()}\nहमारा bond: ${String.format("%.0f", bond.level * 100)}% - ${bond.stage.displayName}"
+            }
+
+            userLower.contains("kya yaad") || userLower.contains("remember") -> {
+                viewModelScope.launch {
+                    val memories = memoryRepository.getMemories(userId)
+                    if (memories.isNotEmpty()) {
+                        "मुझे आपके बारे में कुछ याद है 💭 ${memories.take(3).joinToString { "${it.key}: ${it.value}" }}"
+                    } else {
+                        "अभी तक मुझे आपके बारे में ज्यादा याद नहीं। बताइए आपके बारे में! 😊"
+                    }
+                }
+                "मुझे आपके बारे में कुछ याद है 💭 बताइए क्या जानना चाहते हैं?"
             }
 
             userLower.contains("thanks") || userLower.contains("thank") || userLower.contains("shukriya") || userLower.contains("dhanyawad") -> {
