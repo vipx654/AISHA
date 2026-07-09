@@ -6,6 +6,7 @@ import com.aisha.data.repository.MemoryRepository
 import com.aisha.domain.model.User
 import com.aisha.domain.usecase.GetCurrentUserUseCase
 import com.aisha.domain.usecase.SignOutUseCase
+import com.aisha.presentation.theme.ThemeManager
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,7 +29,8 @@ data class SettingsState(
 class SettingsViewModel @Inject constructor(
     private val getCurrentUserUseCase: GetCurrentUserUseCase,
     private val signOutUseCase: SignOutUseCase,
-    private val memoryRepository: MemoryRepository
+    private val memoryRepository: MemoryRepository,
+    private val themeManager: ThemeManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(SettingsState())
@@ -43,27 +45,27 @@ class SettingsViewModel @Inject constructor(
             val user = getCurrentUserUseCase().first()
             _state.value = _state.value.copy(
                 user = user,
-                isLoading = false
+                isLoading = false,
+                darkModeEnabled = themeManager.isDarkMode,
+                notificationsEnabled = themeManager.isNotificationsEnabled,
+                voiceEnabled = themeManager.isVoiceEnabled
             )
         }
     }
 
     fun toggleDarkMode() {
-        _state.value = _state.value.copy(
-            darkModeEnabled = !_state.value.darkModeEnabled
-        )
+        themeManager.toggleDarkMode()
+        _state.value = _state.value.copy(darkModeEnabled = themeManager.isDarkMode)
     }
 
     fun toggleNotifications() {
-        _state.value = _state.value.copy(
-            notificationsEnabled = !_state.value.notificationsEnabled
-        )
+        themeManager.toggleNotifications()
+        _state.value = _state.value.copy(notificationsEnabled = themeManager.isNotificationsEnabled)
     }
 
     fun toggleVoice() {
-        _state.value = _state.value.copy(
-            voiceEnabled = !_state.value.voiceEnabled
-        )
+        themeManager.toggleVoice()
+        _state.value = _state.value.copy(voiceEnabled = themeManager.isVoiceEnabled)
     }
 
     fun showLogoutDialog() {
@@ -83,10 +85,8 @@ class SettingsViewModel @Inject constructor(
 
     fun clearAllData() {
         viewModelScope.launch {
-            // Clear all local data
             memoryRepository.saveMood(com.aisha.domain.model.Mood())
             memoryRepository.saveBond(0f)
-            // Note: In production, you'd clear SharedPreferences here
         }
     }
 }

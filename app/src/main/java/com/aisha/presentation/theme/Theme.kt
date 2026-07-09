@@ -16,9 +16,22 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 
 private val DarkColorScheme = darkColorScheme(
-    primary = Purple80,
+    primary = Pink40,
     secondary = PurpleGrey80,
-    tertiary = Pink80
+    tertiary = Pink80,
+    background = androidx.compose.ui.graphics.Color(0xFF121212),
+    surface = androidx.compose.ui.graphics.Color(0xFF1E1E1E),
+    onPrimary = androidx.compose.ui.graphics.Color.White,
+    onSecondary = androidx.compose.ui.graphics.Color.White,
+    onTertiary = androidx.compose.ui.graphics.Color.White,
+    onBackground = androidx.compose.ui.graphics.Color(0xFFE1E1E1),
+    onSurface = androidx.compose.ui.graphics.Color(0xFFE1E1E1),
+    onSurfaceVariant = androidx.compose.ui.graphics.Color(0xFFB0B0B0),
+    surfaceVariant = androidx.compose.ui.graphics.Color(0xFF2D2D2D),
+    primaryContainer = androidx.compose.ui.graphics.Color(0xFF4A2C4A),
+    error = androidx.compose.ui.graphics.Color(0xFFCF6679),
+    onError = androidx.compose.ui.graphics.Color.Black,
+    errorContainer = androidx.compose.ui.graphics.Color(0xFF93000A)
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -39,7 +52,7 @@ private val LightColorScheme = lightColorScheme(
 @Composable
 fun AISHATheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
@@ -55,7 +68,7 @@ fun AISHATheme(
         SideEffect {
             val window = (view.context as Activity).window
             window.statusBarColor = colorScheme.primary.toArgb()
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
         }
     }
 
