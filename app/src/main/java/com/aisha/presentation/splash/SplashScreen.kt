@@ -9,7 +9,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Chat
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -20,29 +20,28 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import kotlinx.coroutines.delay
 
 @Composable
 fun SplashScreen(
+    onNavigateToOnboarding: () -> Unit,
     onNavigateToSignIn: () -> Unit,
     onNavigateToHome: () -> Unit,
     viewModel: SplashViewModel = hiltViewModel()
 ) {
     val isAuthenticated by viewModel.isAuthenticated.collectAsState(initial = null)
+    val showOnboarding by viewModel.showOnboarding.collectAsState(initial = null)
 
-    LaunchedEffect(isAuthenticated) {
-        // Small delay for splash display
-        delay(500)
+    LaunchedEffect(isAuthenticated, showOnboarding) {
+        delay(1500)
         
-        when (isAuthenticated) {
-            true -> onNavigateToHome()
-            false -> onNavigateToSignIn()
-            null -> {
-                // Still checking, wait a bit more
-                delay(1000)
-            }
+        when {
+            showOnboarding == true -> onNavigateToOnboarding()
+            isAuthenticated == true -> onNavigateToHome()
+            isAuthenticated == false -> onNavigateToSignIn()
         }
     }
 
@@ -53,25 +52,30 @@ fun SplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Icon(
-            imageVector = Icons.Default.Chat,
-            contentDescription = "AISHA Logo",
-            modifier = Modifier.size(100.dp),
-            tint = MaterialTheme.colorScheme.onPrimary
-        )
+        // Animated AISHA Avatar
+        Box(
+            modifier = Modifier.size(120.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "🌸",
+                style = MaterialTheme.typography.displayLarge
+            )
+        }
 
         Spacer(modifier = Modifier.height(24.dp))
 
         Text(
             text = "AISHA",
             style = MaterialTheme.typography.displayMedium,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colorScheme.onPrimary
         )
 
         Spacer(modifier = Modifier.height(8.dp))
 
         Text(
-            text = "Your AI Assistant",
+            text = "Your AI Companion",
             style = MaterialTheme.typography.bodyLarge,
             color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
         )
@@ -81,6 +85,14 @@ fun SplashScreen(
         CircularProgressIndicator(
             modifier = Modifier.size(48.dp),
             color = MaterialTheme.colorScheme.onPrimary
+        )
+        
+        Spacer(modifier = Modifier.height(16.dp))
+        
+        Text(
+            text = "Loading...",
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.6f)
         )
     }
 }

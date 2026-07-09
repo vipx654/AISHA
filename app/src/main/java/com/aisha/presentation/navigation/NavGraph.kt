@@ -13,6 +13,9 @@ import com.aisha.presentation.profile.EditProfileScreen
 import com.aisha.presentation.profile.ProfileScreen
 import com.aisha.presentation.settings.SettingsScreen
 import com.aisha.presentation.history.HistoryScreen
+import com.aisha.presentation.onboarding.OnboardingScreen
+import com.aisha.presentation.voice.VoiceScreen
+import com.aisha.presentation.tasks.TasksScreen
 import com.aisha.presentation.splash.SplashScreen
 
 @Composable
@@ -26,6 +29,11 @@ fun NavGraph(
     ) {
         composable(NavRoutes.SPLASH) {
             SplashScreen(
+                onNavigateToOnboarding = {
+                    navController.navigate(NavRoutes.ONBOARDING) {
+                        popUpTo(NavRoutes.SPLASH) { inclusive = true }
+                    }
+                },
                 onNavigateToSignIn = {
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(NavRoutes.SPLASH) { inclusive = true }
@@ -34,6 +42,16 @@ fun NavGraph(
                 onNavigateToHome = {
                     navController.navigate(NavRoutes.HOME) {
                         popUpTo(NavRoutes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
+        composable(NavRoutes.ONBOARDING) {
+            OnboardingScreen(
+                onComplete = {
+                    navController.navigate(NavRoutes.SIGN_IN) {
+                        popUpTo(NavRoutes.ONBOARDING) { inclusive = true }
                     }
                 }
             )
@@ -151,6 +169,22 @@ fun NavGraph(
 
         composable(NavRoutes.HISTORY) {
             HistoryScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.VOICE) {
+            VoiceScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.TASKS) {
+            TasksScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
