@@ -16,6 +16,8 @@ import com.aisha.presentation.history.HistoryScreen
 import com.aisha.presentation.onboarding.OnboardingScreen
 import com.aisha.presentation.voice.VoiceScreen
 import com.aisha.presentation.tasks.TasksScreen
+import com.aisha.presentation.mood.MoodScreen
+import com.aisha.presentation.relationship.RelationshipScreen
 import com.aisha.presentation.splash.SplashScreen
 
 @Composable
@@ -185,6 +187,22 @@ fun NavGraph(
 
         composable(NavRoutes.TASKS) {
             TasksScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.MOOD) {
+            MoodScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.RELATIONSHIP) {
+            RelationshipScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
