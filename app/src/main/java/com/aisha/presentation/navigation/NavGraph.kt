@@ -11,6 +11,7 @@ import com.aisha.presentation.chat.ChatScreen
 import com.aisha.presentation.home.HomeScreen
 import com.aisha.presentation.profile.EditProfileScreen
 import com.aisha.presentation.profile.ProfileScreen
+import com.aisha.presentation.settings.SettingsScreen
 import com.aisha.presentation.splash.SplashScreen
 
 @Composable
@@ -109,6 +110,9 @@ fun NavGraph(
                 onNavigateToEditProfile = {
                     navController.navigate(NavRoutes.EDIT_PROFILE)
                 },
+                onNavigateToSettings = {
+                    navController.navigate(NavRoutes.SETTINGS)
+                },
                 onSignOut = {
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(NavRoutes.HOME) { inclusive = true }
@@ -124,6 +128,19 @@ fun NavGraph(
                 },
                 onProfileUpdated = {
                     navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.SETTINGS) {
+            SettingsScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                },
+                onSignOut = {
+                    navController.navigate(NavRoutes.SIGN_IN) {
+                        popUpTo(NavRoutes.HOME) { inclusive = true }
+                    }
                 }
             )
         }

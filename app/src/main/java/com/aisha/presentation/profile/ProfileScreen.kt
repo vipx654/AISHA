@@ -16,6 +16,7 @@ import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Logout
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -44,6 +45,7 @@ import com.aisha.presentation.components.LoadingIndicator
 fun ProfileScreen(
     onNavigateBack: () -> Unit,
     onNavigateToEditProfile: () -> Unit,
+    onNavigateToSettings: () -> Unit,
     onSignOut: () -> Unit,
     viewModel: ProfileViewModel = hiltViewModel()
 ) {
@@ -62,16 +64,16 @@ fun ProfileScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onNavigateToSettings) {
+                        Icon(
+                            imageVector = Icons.Default.Settings,
+                            contentDescription = "Settings"
+                        )
+                    }
                     IconButton(onClick = onNavigateToEditProfile) {
                         Icon(
                             imageVector = Icons.Default.Edit,
                             contentDescription = "Edit Profile"
-                        )
-                    }
-                    IconButton(onClick = { viewModel.signOut(onSignOut) }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.Logout,
-                            contentDescription = "Sign Out"
                         )
                     }
                 },
