@@ -38,3 +38,6 @@ Thumbs.db
 *.aab
 *.ap_
 *.dex
+
+# Exception: Release APKs
+!releases/*.apk
