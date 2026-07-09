@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Logout
 import androidx.compose.material.icons.filled.Mic
@@ -55,6 +56,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 @Composable
 fun SettingsScreen(
     onNavigateBack: () -> Unit,
+    onNavigateToHistory: () -> Unit,
     onSignOut: () -> Unit,
     viewModel: SettingsViewModel = hiltViewModel()
 ) {
@@ -145,6 +147,15 @@ fun SettingsScreen(
             SectionTitle("Data & Privacy")
 
             SettingsCard {
+                SettingsClickItem(
+                    icon = Icons.Default.History,
+                    title = "Chat History",
+                    subtitle = "View past conversations",
+                    onClick = onNavigateToHistory
+                )
+
+                HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
+
                 SettingsClickItem(
                     icon = Icons.Default.Delete,
                     title = "Clear Chat History",

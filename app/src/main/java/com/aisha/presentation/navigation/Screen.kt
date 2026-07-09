@@ -10,6 +10,7 @@ sealed class Screen(val route: String) {
     data object Profile : Screen("profile")
     data object EditProfile : Screen("edit_profile")
     data object Settings : Screen("settings")
+    data object History : Screen("history")
 }
 
 object NavRoutes {
@@ -22,4 +23,5 @@ object NavRoutes {
     const val PROFILE = "profile"
     const val EDIT_PROFILE = "edit_profile"
     const val SETTINGS = "settings"
+    const val HISTORY = "history"
 }

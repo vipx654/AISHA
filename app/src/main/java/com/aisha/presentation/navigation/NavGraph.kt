@@ -12,6 +12,7 @@ import com.aisha.presentation.home.HomeScreen
 import com.aisha.presentation.profile.EditProfileScreen
 import com.aisha.presentation.profile.ProfileScreen
 import com.aisha.presentation.settings.SettingsScreen
+import com.aisha.presentation.history.HistoryScreen
 import com.aisha.presentation.splash.SplashScreen
 
 @Composable
@@ -137,10 +138,21 @@ fun NavGraph(
                 onNavigateBack = {
                     navController.popBackStack()
                 },
+                onNavigateToHistory = {
+                    navController.navigate(NavRoutes.HISTORY)
+                },
                 onSignOut = {
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(NavRoutes.HOME) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(NavRoutes.HISTORY) {
+            HistoryScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
