@@ -10,16 +10,32 @@ import com.aisha.presentation.auth.SignUpScreen
 import com.aisha.presentation.home.HomeScreen
 import com.aisha.presentation.profile.EditProfileScreen
 import com.aisha.presentation.profile.ProfileScreen
+import com.aisha.presentation.splash.SplashScreen
 
 @Composable
 fun NavGraph(
     navController: NavHostController,
-    startDestination: String = NavRoutes.SIGN_IN
+    startDestination: String = NavRoutes.SPLASH
 ) {
     NavHost(
         navController = navController,
         startDestination = startDestination
     ) {
+        composable(NavRoutes.SPLASH) {
+            SplashScreen(
+                onNavigateToSignIn = {
+                    navController.navigate(NavRoutes.SIGN_IN) {
+                        popUpTo(NavRoutes.SPLASH) { inclusive = true }
+                    }
+                },
+                onNavigateToHome = {
+                    navController.navigate(NavRoutes.HOME) {
+                        popUpTo(NavRoutes.SPLASH) { inclusive = true }
+                    }
+                }
+            )
+        }
+
         composable(NavRoutes.SIGN_IN) {
             SignInScreen(
                 onNavigateToSignUp = {

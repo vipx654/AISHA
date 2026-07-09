@@ -10,7 +10,6 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.navigation.compose.rememberNavController
 import com.aisha.presentation.navigation.NavGraph
-import com.aisha.presentation.navigation.NavRoutes
 import com.aisha.presentation.theme.AISHATheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -26,10 +25,7 @@ class MainActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     val navController = rememberNavController()
-                    NavGraph(
-                        navController = navController,
-                        startDestination = NavRoutes.SIGN_IN
-                    )
+                    NavGraph(navController = navController)
                 }
             }
         }
