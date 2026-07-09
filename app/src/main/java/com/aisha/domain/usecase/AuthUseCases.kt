@@ -4,7 +4,7 @@ import com.aisha.domain.model.Result
 import com.aisha.domain.model.User
 import com.aisha.domain.repository.AuthRepository
 import com.aisha.domain.repository.UserRepository
-import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class SignInUseCase @Inject constructor(
@@ -21,16 +21,24 @@ class SignUpUseCase @Inject constructor(
     private val userRepository: UserRepository
 ) {
     suspend operator fun invoke(email: String, password: String, displayName: String): Result<User> {
-        val result = authRepository.signUp(email, password)
-        if (result is Result.Success) {
-            val user = result.data.copy(displayName = displayName)
-            val saveResult = userRepository.saveUser(user)
-            if (saveResult is Result.Error) {
-                // User created in Firebase Auth but failed to save to Firestore
-                // Log the error but still return success since auth succeeded
+        // Create Firebase Auth account first
+        val authResult = authRepository.signUp(email, password)
+        
+        if (authResult is Result.Success) {
+            val user = authResult.data.copy(displayName = displayName)
+            
+            // Save user to Firestore in background - don't await
+            // This ensures sign up succeeds even if Firestore fails
+            kotlinx.coroutines.GlobalScope.launch {
+                try {
+                    userRepository.saveUser(user)
+                } catch (e: Exception) {
+                    // Ignore - auth account was created
+                }
             }
         }
-        return result
+        
+        return authResult
     }
 }
 
