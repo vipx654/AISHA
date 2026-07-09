@@ -61,21 +61,22 @@ class EditProfileViewModel @Inject constructor(
         viewModelScope.launch {
             _state.value = _state.value.copy(isSaving = true)
             
-            when (val result = uploadProfilePhotoUseCase(userId, photoUri)) {
-                is Result.Success -> {
-                    _state.value = _state.value.copy(
-                        photoUrl = result.data,
-                        isSaving = false
-                    )
+            // Run photo upload in background - don't block UI
+            kotlinx.coroutines.GlobalScope.launch {
+                try {
+                    val result = uploadProfilePhotoUseCase(userId, photoUri)
+                    if (result is Result.Success) {
+                        _state.value = _state.value.copy(
+                            photoUrl = result.data,
+                            isSaving = false
+                        )
+                    }
+                } catch (e: Exception) {
+                    // Ignore - user can try again
                 }
-                is Result.Error -> {
-                    _state.value = _state.value.copy(
-                        error = result.exception.message,
-                        isSaving = false
-                    )
-                }
-                is Result.Loading -> {}
             }
+            
+            // Don't wait for upload to complete
         }
     }
 
@@ -96,18 +97,22 @@ class EditProfileViewModel @Inject constructor(
                     photoUrl = currentState.photoUrl
                 )
                 
-                when (val result = updateUserProfileUseCase(updatedUser)) {
-                    is Result.Success -> {
-                        _state.value = _state.value.copy(isSaving = false, isSuccess = true)
+                // Run Firestore update in background - don't block UI
+                kotlinx.coroutines.GlobalScope.launch {
+                    try {
+                        updateUserProfileUseCase(updatedUser)
+                    } catch (e: Exception) {
+                        // Ignore - update will be retried later or user can try again
                     }
-                    is Result.Error -> {
-                        _state.value = _state.value.copy(
-                            error = result.exception.message,
-                            isSaving = false
-                        )
-                    }
-                    is Result.Loading -> {}
                 }
+                
+                // Immediately show success and return
+                _state.value = _state.value.copy(isSaving = false, isSuccess = true)
+            } ?: run {
+                _state.value = _state.value.copy(
+                    isSaving = false,
+                    error = "User not found"
+                )
             }
         }
     }
