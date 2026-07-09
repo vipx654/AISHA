@@ -97,6 +97,16 @@ class MemoryLocalDataSource @Inject constructor(
         }
     }
 
+    fun getAllDayLogsSync(): List<DayLog> {
+        val json = prefs.getString(KEY_DAY_LOGS, null) ?: return emptyList()
+        return try {
+            val type = object : TypeToken<List<DayLog>>() {}.type
+            gson.fromJson<List<DayLog>>(json, type)?.filter { !it.isDeleted } ?: emptyList()
+        } catch (e: Exception) {
+            emptyList()
+        }
+    }
+
     suspend fun addConversationEntry(
         userMessage: String,
         aishaResponse: String,
@@ -250,5 +260,11 @@ class MemoryLocalDataSource @Inject constructor(
                 saveMemory(userId, key, userMessage, "Interest mentioned")
             }
         }
+    }
+
+    // ============ Clear All Data ============
+    
+    suspend fun clearAll() = withContext(Dispatchers.IO) {
+        prefs.edit().clear().apply()
     }
 }

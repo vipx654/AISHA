@@ -4,6 +4,7 @@ import com.aisha.data.local.MemoryLocalDataSource
 import com.aisha.domain.model.DayLog
 import com.aisha.domain.model.Memory
 import com.aisha.domain.model.Mood
+import kotlinx.coroutines.runBlocking
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -22,6 +23,10 @@ class MemoryRepository @Inject constructor(
 
     suspend fun getAllDayLogs(): List<DayLog> {
         return localDataSource.getAllDayLogs()
+    }
+
+    fun getDayLogs(): List<DayLog> {
+        return localDataSource.getAllDayLogsSync()
     }
 
     suspend fun deleteDayLog(date: String) {
@@ -44,11 +49,31 @@ class MemoryRepository @Inject constructor(
         return localDataSource.getCurrentMood()
     }
 
+    fun getMoodOrNull(): Mood? {
+        return try {
+            runBlocking { localDataSource.getCurrentMood() }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
     suspend fun saveBond(level: Float) {
         localDataSource.saveCurrentBond(level)
     }
 
     suspend fun getBond(): Float {
         return localDataSource.getCurrentBond()
+    }
+
+    fun getBondOrNull(): Float? {
+        return try {
+            runBlocking { localDataSource.getCurrentBond() }
+        } catch (e: Exception) {
+            null
+        }
+    }
+
+    suspend fun clearAllData() {
+        localDataSource.clearAll()
     }
 }

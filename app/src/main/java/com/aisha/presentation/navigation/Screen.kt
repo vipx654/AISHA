@@ -16,6 +16,7 @@ sealed class Screen(val route: String) {
     data object Tasks : Screen("tasks")
     data object Mood : Screen("mood")
     data object Relationship : Screen("relationship")
+    data object Export : Screen("export")
 }
 
 object NavRoutes {
@@ -34,4 +35,5 @@ object NavRoutes {
     const val TASKS = "tasks"
     const val MOOD = "mood"
     const val RELATIONSHIP = "relationship"
+    const val EXPORT = "export"
 }

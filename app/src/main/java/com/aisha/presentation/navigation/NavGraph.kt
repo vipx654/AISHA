@@ -18,6 +18,7 @@ import com.aisha.presentation.voice.VoiceScreen
 import com.aisha.presentation.tasks.TasksScreen
 import com.aisha.presentation.mood.MoodScreen
 import com.aisha.presentation.relationship.RelationshipScreen
+import com.aisha.presentation.export.ExportScreen
 import com.aisha.presentation.splash.SplashScreen
 
 @Composable
@@ -203,6 +204,14 @@ fun NavGraph(
 
         composable(NavRoutes.RELATIONSHIP) {
             RelationshipScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
+                }
+            )
+        }
+
+        composable(NavRoutes.EXPORT) {
+            ExportScreen(
                 onNavigateBack = {
                     navController.popBackStack()
                 }
