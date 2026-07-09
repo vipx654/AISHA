@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Chat
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -35,7 +37,8 @@ import com.aisha.presentation.components.LoadingIndicator
 @Composable
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
-    @Suppress("UNUSED_PARAMETER") onSignOut: () -> Unit,
+    onNavigateToChat: () -> Unit,
+    onSignOut: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
     val state by viewModel.state.collectAsState()
@@ -135,8 +138,24 @@ fun HomeScreen(
 
                 Spacer(modifier = Modifier.height(48.dp))
 
+                // Chat Button
+                Button(
+                    onClick = onNavigateToChat,
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Chat,
+                        contentDescription = null,
+                        modifier = Modifier.size(20.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text("Chat with AISHA 🌸")
+                }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
                 Text(
-                    text = "This is your home screen after authentication.",
+                    text = "Start a conversation to build your bond with AISHA",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )

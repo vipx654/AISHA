@@ -7,6 +7,7 @@ import androidx.navigation.compose.composable
 import com.aisha.presentation.auth.ForgotPasswordScreen
 import com.aisha.presentation.auth.SignInScreen
 import com.aisha.presentation.auth.SignUpScreen
+import com.aisha.presentation.chat.ChatScreen
 import com.aisha.presentation.home.HomeScreen
 import com.aisha.presentation.profile.EditProfileScreen
 import com.aisha.presentation.profile.ProfileScreen
@@ -81,10 +82,21 @@ fun NavGraph(
                 onNavigateToProfile = {
                     navController.navigate(NavRoutes.PROFILE)
                 },
+                onNavigateToChat = {
+                    navController.navigate(NavRoutes.CHAT)
+                },
                 onSignOut = {
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(NavRoutes.HOME) { inclusive = true }
                     }
+                }
+            )
+        }
+
+        composable(NavRoutes.CHAT) {
+            ChatScreen(
+                onNavigateBack = {
+                    navController.popBackStack()
                 }
             )
         }
