@@ -56,12 +56,14 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.aisha.domain.model.Message
 import com.aisha.presentation.components.LoadingIndicator
 import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
 import java.util.Locale
 
@@ -70,6 +72,11 @@ import java.util.Locale
 fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToChat: () -> Unit,
+    onNavigateToVoice: () -> Unit,
+    onNavigateToTasks: () -> Unit,
+    onNavigateToMood: () -> Unit,
+    onNavigateToRelationship: () -> Unit,
+    onNavigateToExport: () -> Unit,
     onSignOut: () -> Unit,
     viewModel: HomeViewModel = hiltViewModel()
 ) {
@@ -129,6 +136,17 @@ fun HomeScreen(
                     mood = state.mood,
                     bond = state.bond,
                     isThinking = state.isAISHAThinking
+                )
+
+                // Greeting and Quick Actions
+                GreetingSection(
+                    userName = state.user?.displayName ?: "Friend",
+                    bondLevel = state.bond.level,
+                    onVoiceClick = onNavigateToVoice,
+                    onTasksClick = onNavigateToTasks,
+                    onMoodClick = onNavigateToMood,
+                    onRelationshipClick = onNavigateToRelationship,
+                    onExportClick = onNavigateToExport
                 )
 
                 // Mood Bar
@@ -314,6 +332,101 @@ private fun MoodDot(emoji: String, value: Float, label: String) {
             text = "${String.format("%.0f", value * 100)}%",
             style = MaterialTheme.typography.labelSmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+@Composable
+private fun GreetingSection(
+    userName: String,
+    bondLevel: Float,
+    onVoiceClick: () -> Unit,
+    onTasksClick: () -> Unit,
+    onMoodClick: () -> Unit,
+    onRelationshipClick: () -> Unit,
+    onExportClick: () -> Unit
+) {
+    val greeting = when (Calendar.getInstance().get(Calendar.HOUR_OF_DAY)) {
+        in 5..11 -> "Good Morning"
+        in 12..16 -> "Good Afternoon"
+        in 17..20 -> "Good Evening"
+        else -> "Good Night"
+    }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp, vertical = 8.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.5f)
+        ),
+        shape = RoundedCornerShape(16.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Text(
+                        text = "$greeting, $userName!",
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.SemiBold
+                    )
+                    Text(
+                        text = when {
+                            bondLevel >= 0.75f -> "💕 We have a special bond!"
+                            bondLevel >= 0.5f -> "🌸 We're getting closer!"
+                            else -> "🌱 Growing together!"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+                    )
+                }
+                Text(
+                    text = "🌸",
+                    style = MaterialTheme.typography.headlineMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(12.dp))
+
+            // Quick Action Buttons
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceEvenly
+            ) {
+                QuickActionButton("🎤", "Voice", onVoiceClick)
+                QuickActionButton("📋", "Tasks", onTasksClick)
+                QuickActionButton("😊", "Mood", onMoodClick)
+                QuickActionButton("❤️", "Bond", onRelationshipClick)
+                QuickActionButton("📦", "Data", onExportClick)
+            }
+        }
+    }
+}
+
+@Composable
+private fun QuickActionButton(
+    emoji: String,
+    label: String,
+    onClick: () -> Unit
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .clip(RoundedCornerShape(12.dp))
+            .clickable { onClick() }
+            .padding(8.dp)
+    ) {
+        Text(text = emoji, style = MaterialTheme.typography.titleLarge)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
         )
     }
 }

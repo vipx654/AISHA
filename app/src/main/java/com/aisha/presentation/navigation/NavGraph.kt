@@ -108,6 +108,21 @@ fun NavGraph(
                 onNavigateToChat = {
                     navController.navigate(NavRoutes.CHAT)
                 },
+                onNavigateToVoice = {
+                    navController.navigate(NavRoutes.VOICE)
+                },
+                onNavigateToTasks = {
+                    navController.navigate(NavRoutes.TASKS)
+                },
+                onNavigateToMood = {
+                    navController.navigate(NavRoutes.MOOD)
+                },
+                onNavigateToRelationship = {
+                    navController.navigate(NavRoutes.RELATIONSHIP)
+                },
+                onNavigateToExport = {
+                    navController.navigate(NavRoutes.EXPORT)
+                },
                 onSignOut = {
                     navController.navigate(NavRoutes.SIGN_IN) {
                         popUpTo(NavRoutes.HOME) { inclusive = true }
